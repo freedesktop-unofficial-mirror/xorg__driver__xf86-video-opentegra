@@ -39,7 +39,9 @@
 #include "xf86.h"
 #include "xf86_OSproc.h"
 #include "compiler.h"
+#ifdef XSERVER_PLATFORM_BUS
 #include "xf86platformBus.h"
+#endif
 #include "mipointer.h"
 #include "micmap.h"
 
@@ -334,10 +336,12 @@ TegraPreInit(ScrnInfoPtr pScrn, int flags)
     pScrn->rgbBits = 8;
 
     switch (pEnt->location.type) {
+#ifdef XSERVER_PLATFORM_BUS
     case BUS_PLATFORM:
         path = xf86_get_platform_device_attrib(pEnt->location.id.plat,
                                                ODEV_ATTRIB_PATH);
         break;
+#endif
 
     default:
         path = xf86GetOptValString(tegra->pEnt->device->options,
@@ -772,6 +776,7 @@ TegraValidMode(SCRN_ARG_TYPE arg, DisplayModePtr mode, Bool verbose, int flags)
     return MODE_OK;
 }
 
+#ifdef XSERVER_PLATFORM_BUS
 static Bool
 TegraPlatformProbe(DriverPtr driver, int entity_num, int flags,
                    struct xf86_platform_device *dev, intptr_t match_data)
@@ -802,6 +807,7 @@ TegraPlatformProbe(DriverPtr driver, int entity_num, int flags,
 
     return scrn != NULL;
 }
+#endif
 
 static Bool
 TegraProbe(DriverPtr drv, int flags)
@@ -867,7 +873,9 @@ _X_EXPORT DriverRec tegra = {
     TegraDriverFunc,
     NULL,
     NULL,
+#ifdef XSERVER_PLATFORM_BUS
     TegraPlatformProbe,
+#endif
 };
 
 static MODULESETUPPROTO(Setup);
