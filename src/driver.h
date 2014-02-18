@@ -32,6 +32,7 @@
 #include <xf86drm.h>
 #include <damage.h>
 
+#include "compat-api.h"
 #include "drmmode_display.h"
 
 typedef struct
