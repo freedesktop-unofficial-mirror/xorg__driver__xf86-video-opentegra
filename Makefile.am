@@ -22,6 +22,11 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src man
 
+if HAVE_OUTPUTCLASS
+sysconfig_DATA = \
+	opentegra.conf
+endif
+
 INSTALL:
 	$(INSTALL_CMD)
 
@@ -30,6 +35,31 @@ ChangeLog:
 
 dist-hook: ChangeLog INSTALL
 
+EXTRA_DIST = \
+	opentegra.conf
+
+#
+# This is needed to work around some weird behaviour in make distcheck. What
+# distcheck will try to do is run something like the following:
+#
+#   $ ./configure --prefix=$(distdir)/_inst
+#   $ make install
+#
+# However that will fail to install the opentegra.org file because the path
+# where it is to be installed is retrieved from the xorg-server.pc file's
+# sysconfigdir variable. Unfortunately that already has the ${prefix} value
+# expanded, so make distcheck will effectively try to install this file into
+# /usr/share/X11/xorg.conf.d, which will fail if run as normal user.
+#
+# We outsmart automake by overriding sysconfigdir on the configure command-
+# line, using ${datarootdir} as prefix so that the file ends up installed
+# somewhere below the prefix set by distcheck. Note that it's possible that
+# the path will not be what the X.Org X server was configured with, but the
+# workaround here is only used for sanity checking the distribution tarball
+# anyway, therefore the file will never be used, so the exact location does
+# not matter.
+#
+AM_DISTCHECK_CONFIGURE_FLAGS = sysconfigdir=\$${datarootdir}/X11/xorg.conf.d
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 
 .PHONY: ChangeLog INSTALL

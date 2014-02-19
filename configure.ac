@@ -77,6 +77,27 @@ if test x"$udev" = xyes; then
 	AC_DEFINE(HAVE_UDEV,1,[Enable udev-based monitor hotplug detection])
 fi
 
+AC_MSG_CHECKING([for OutputClass support in the X.Org X server])
+AC_PREPROC_IFELSE(
+	[AC_LANG_PROGRAM([
+		#include <xorg/xorg-server.h>
+		#include <xorg/xorgVersion.h>
+	], [
+		#if XORG_VERSION_CURRENT < XORG_VERSION_NUMERIC(1,15,99,904,0)
+		#  error xorg.conf OutputClass support requires 1.15.99.904
+		#endif
+	])], [have_outputclass=yes], [have_outputclass=no])
+AC_MSG_RESULT([$have_outputclass])
+
+if test "x$have_outputclass" = "xyes"; then
+	AC_MSG_CHECKING([for X.Org X server sysconfigdir variable])
+	PKG_CHECK_VAR([sysconfigdir], [xorg-server], [sysconfigdir])
+	AC_MSG_RESULT([$sysconfigdir])
+	AC_SUBST([sysconfigdir])
+fi
+
+AM_CONDITIONAL([HAVE_OUTPUTCLASS], [test "x$have_outputclass" = "xyes"])
+
 SAVE_CFLAGS=$CFLAGS
 SAVE_LIBS=$LIBS
 CFLAGS=$DRM_CFLAGS
