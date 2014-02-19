@@ -66,3 +66,5 @@ typedef struct _TegraRec
 } TegraRec, *TegraPtr;
 
 #define TegraPTR(p) ((TegraPtr)((p)->driverPrivate))
+
+/* vim: set et sts=4 sw=4 ts=4: */
